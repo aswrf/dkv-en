@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DKV World - Content Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0F172A;
+            --accent: #3B82F6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --text: #1E293B;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        .cms-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cms-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cms-logo::before {
+            content: '⚡';
+            font-size: 1.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563EB;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Main Layout */
+        .cms-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .cms-sidebar {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg);
+        }
+
+        .sidebar-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .sidebar-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .cms-content {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .content-subtitle {
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Form Groups */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
+            background: var(--surface);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Products List */
+        .products-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .product-item {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 1.25rem;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .product-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .product-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .product-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: var(--bg);
+            color: var(--danger);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Color Picker */
+        .color-picker-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .color-picker {
+            width: 60px;
+            height: 40px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Preview Button */
+        .preview-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .preview-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        @media (max-width: 968px) {
+            .cms-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cms-sidebar {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="cms-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="cms-logo">CMS Panel</div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        💾 Export Data
+                    </button>
+                    <button class="btn btn-success" onclick="saveAll()">
+                        ✓ Save All Changes
+                    </button>
+                    <button class="btn btn-primary" onclick="window.open('index.html', '_blank')">
+                        👁️ Preview Site
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="container">
+        <div class="cms-layout">
+            <!-- Sidebar -->
+            <aside class="cms-sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Content</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item active" onclick="showSection('hero')">
+                            <span class="sidebar-icon">🏠</span>
+                            <span>Hero Section</span>
+                        </li>
+                        <li class="sidebar-item" onclick="showSection('products')">
+                            <span class="sidebar-icon">📦</span>
+                            <span>Products</span>
+                        </li>
+                        <li class="sidebar-item" onclick="showSection('categories')">
+                            <span class="sidebar-icon">📁</span>
+                            <span>Categories</span>
+                        </li>
+                        <li class="sidebar-item" onclick="showSection('features')">
+                            <span class="sidebar-icon">⭐</span>
+                            <span>Features</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Settings</div>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item" onclick="showSection('contact')">
+                            <span class="sidebar-icon">📞</span>
+                            <span>Contact Info</span>
+                        </li>
+                        <li class="sidebar-item" onclick="showSection('colors')">
+                            <span class="sidebar-icon">🎨</span>
+                            <span>Colors & Theme</span>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="cms-content">
+                <!-- Hero Section -->
+                <section id="hero" class="section active">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="content-title">Hero Section</h1>
+                            <p class="content-subtitle">Edit main banner and call-to-action</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="form-group">
+                            <label class="form-label">Main Heading</label>
+                            <input type="text" class="form-input" id="heroTitle" value="Professional Architecture Design Plans">
+                            <p class="form-help">Main headline displayed on homepage</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Subtitle</label>
+                            <input type="text" class="form-input" id="heroSubtitle" value="Over 1000+ House, Villa, and Interior Design Plans - Best Market Prices">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Primary Button Text</label>
+                                <input type="text" class="form-input" id="heroBtnPrimary" value="View Plans">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Secondary Button Text</label>
+                                <input type="text" class="form-input" id="heroBtnSecondary" value="Free Consultation">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Products Section -->
+                <section id="products" class="section">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="content-title">Products Management</h1>
+                            <p class="content-subtitle">Add, edit, or remove products</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openProductModal()">
+                            ➕ Add Product
+                        </button>
+                    </div>
+
+                    <div id="productsList" class="products-list">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Categories Section -->
+                <section id="categories" class="section">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="content-title">Categories</h1>
+                            <p class="content-subtitle">Manage product categories</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openCategoryModal()">
+                            ➕ Add Category
+                        </button>
+                    </div>
+
+                    <div id="categoriesList" class="products-list">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section id="features" class="section">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="content-title">Features Section</h1>
+                            <p class="content-subtitle">Why customers choose you</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">Section Title</h3>
+                        <div class="form-group">
+                            <input type="text" class="form-input" id="featuresTitle" value="Why Choose Us?">
+                        </div>
+                    </div>
+
+                    <div id="featuresList">
+                        <!-- Features will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Contact Info Section -->
+                <section id="contact" class="section">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="content-title">Contact Information</h1>
+                            <p class="content-subtitle">Update your contact details</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-input" id="contactPhone" value="+1 (555) 123-4567">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" id="contactEmail" value="info@archdesignplans.com">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Business Address</label>
+                            <input type="text" class="form-input" id="contactAddress" value="Ninh Binh, Vietnam">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Business Hours</label>
+                            <input type="text" class="form-input" id="contactHours" value="8:00 AM - 8:00 PM">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">About Us Description</label>
+                            <textarea class="form-textarea" id="aboutDescription">Specialized in providing high-quality architecture design plans at reasonable prices. Over 10 years of experience in the design industry.</textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Colors Section -->
+                <section id="colors" class="section">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="content-title">Colors & Theme</h1>
+                            <p class="content-subtitle">Customize your website colors</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="form-group">
+                            <label class="form-label">Primary Color (Headers, Main Elements)</label>
+                            <div class="color-picker-group">
+                                <input type="color" class="color-picker" id="colorPrimary" value="#1e3a8a">
+                                <input type="text" class="form-input" id="colorPrimaryText" value="#1e3a8a" style="max-width: 150px;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Accent Color (Buttons, Links)</label>
+                            <div class="color-picker-group">
+                                <input type="color" class="color-picker" id="colorAccent" value="#f59e0b">
+                                <input type="text" class="form-input" id="colorAccentText" value="#f59e0b" style="max-width: 150px;">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add/Edit Product</h2>
+                <button class="close-modal" onclick="closeModal('productModal')">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-input" id="productName">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="productCategory">
+                    <option>TOWNHOUSE</option>
+                    <option>VILLA</option>
+                    <option>BUNGALOW</option>
+                    <option>APARTMENT</option>
+                    <option>INTERIOR</option>
+                    <option>CAFE</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Price (USD)</label>
+                <input type="number" class="form-input" id="productPrice" placeholder="99">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea class="form-textarea" id="productDescription"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Icon Emoji</label>
+                <input type="text" class="form-input" id="productIcon" placeholder="📐" maxlength="2">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Background Gradient</label>
+                <select class="form-select" id="productGradient">
+                    <option value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">Purple</option>
+                    <option value="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">Pink</option>
+                    <option value="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">Blue</option>
+                    <option value="linear-gradient(135deg, #fa709a 0%, #fee140 100%)">Coral</option>
+                    <option value="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)">Mint</option>
+                    <option value="linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)">Peach</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="closeModal('productModal')">Cancel</button>
+                <button class="btn btn-success" onclick="saveProduct()">Save Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add/Edit Category</h2>
+                <button class="close-modal" onclick="closeModal('categoryModal')">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Category Name</label>
+                <input type="text" class="form-input" id="categoryName">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Icon Emoji</label>
+                <input type="text" class="form-input" id="categoryIcon" placeholder="🏠" maxlength="2">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea class="form-textarea" id="categoryDescription"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="closeModal('categoryModal')">Cancel</button>
+                <button class="btn btn-success" onclick="saveCategory()">Save Category</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span style="font-size: 1.5rem;">✓</span>
+        <span id="toastMessage">Changes saved successfully!</span>
+    </div>
+
+    <script>
+        // Data Storage
+        let siteData = {
+            hero: {
+                title: "Professional Architecture Design Plans",
+                subtitle: "Over 1000+ House, Villa, and Interior Design Plans - Best Market Prices",
+                btnPrimary: "View Plans",
+                btnSecondary: "Free Consultation"
+            },
+            products: [
+                {
+                    id: 1,
+                    name: "Modern 4-Story Townhouse Plan",
+                    category: "TOWNHOUSE",
+                    price: 99,
+                    description: "Area: 16x65ft - Modern style, optimized space",
+                    icon: "📐",
+                    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                },
+                {
+                    id: 2,
+                    name: "2-Story Neoclassical Villa Design",
+                    category: "VILLA",
+                    price: 189,
+                    description: "Area: 33x50ft - Elegant French style",
+                    icon: "🏠",
+                    gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                },
+                {
+                    id: 3,
+                    name: "Thai Roof Bungalow Plan",
+                    category: "BUNGALOW",
+                    price: 69,
+                    description: "Area: 26x40ft - 3 bedrooms, cozy design",
+                    icon: "🏡",
+                    gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+                }
+            ],
+            categories: [
+                { id: 1, name: "Townhouse", icon: "🏠", description: "1-5 story townhouse plans, various styles" },
+                { id: 2, name: "Villa", icon: "🏰", description: "Modern and classic luxury villa designs" },
+                { id: 3, name: "Bungalow", icon: "🏡", description: "Simple, cost-effective single-story homes" },
+                { id: 4, name: "Apartment", icon: "🏢", description: "Apartment and condo interior plans" },
+                { id: 5, name: "Interior Design", icon: "🛋️", description: "Living room, kitchen, bedroom designs" },
+                { id: 6, name: "Commercial", icon: "🏪", description: "Restaurant and cafe space designs" }
+            ],
+            features: [
+                { icon: "✅", title: "Quality Plans", description: "Professional AutoCAD, PDF files with full details" },
+                { icon: "⚡", title: "Fast Delivery", description: "Receive files immediately after payment via email" },
+                { icon: "💰", title: "Reasonable Prices", description: "Save up to 70% compared to custom design" },
+                { icon: "🔧", title: "Modification Support", description: "Consultation and adjustment support on request" }
+            ],
+            contact: {
+                phone: "+1 (555) 123-4567",
+                email: "info@archdesignplans.com",
+                address: "Ninh Binh, Vietnam",
+                hours: "8:00 AM - 8:00 PM",
+                about: "Specialized in providing high-quality architecture design plans at reasonable prices. Over 10 years of experience in the design industry."
+            },
+            colors: {
+                primary: "#1e3a8a",
+                accent: "#f59e0b"
+            }
+        };
+
+        // Load from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('dkvworld_cms_data');
+            if (saved) {
+                siteData = JSON.parse(saved);
+            }
+            renderAll();
+        }
+
+        // Save to localStorage
+        function saveData() {
+            localStorage.setItem('dkvworld_cms_data', JSON.stringify(siteData));
+        }
+
+        // Show Section
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Render Products
+        function renderProducts() {
+            const list = document.getElementById('productsList');
+            list.innerHTML = siteData.products.map(product => `
+                <div class="product-item">
+                    <div class="product-icon" style="background: ${product.gradient}">
+                        ${product.icon}
+                    </div>
+                    <div class="product-info">
+                        <h4>${product.name}</h4>
+                        <p>${product.description}</p>
+                        <small style="color: var(--text-muted)">${product.category}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="product-price">$${product.price}</div>
+                        <div class="product-actions" style="margin-top: 0.5rem;">
+                            <button class="btn btn-sm btn-secondary" onclick="editProduct(${product.id})">✏️ Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Categories
+        function renderCategories() {
+            const list = document.getElementById('categoriesList');
+            list.innerHTML = siteData.categories.map(cat => `
+                <div class="product-item">
+                    <div class="product-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+                        ${cat.icon}
+                    </div>
+                    <div class="product-info">
+                        <h4>${cat.name}</h4>
+                        <p>${cat.description}</p>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="editCategory(${cat.id})">✏️ Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCategory(${cat.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render All
+        function renderAll() {
+            // Load hero values
+            document.getElementById('heroTitle').value = siteData.hero.title;
+            document.getElementById('heroSubtitle').value = siteData.hero.subtitle;
+            document.getElementById('heroBtnPrimary').value = siteData.hero.btnPrimary;
+            document.getElementById('heroBtnSecondary').value = siteData.hero.btnSecondary;
+
+            // Load contact values
+            document.getElementById('contactPhone').value = siteData.contact.phone;
+            document.getElementById('contactEmail').value = siteData.contact.email;
+            document.getElementById('contactAddress').value = siteData.contact.address;
+            document.getElementById('contactHours').value = siteData.contact.hours;
+            document.getElementById('aboutDescription').value = siteData.contact.about;
+
+            // Load colors
+            document.getElementById('colorPrimary').value = siteData.colors.primary;
+            document.getElementById('colorPrimaryText').value = siteData.colors.primary;
+            document.getElementById('colorAccent').value = siteData.colors.accent;
+            document.getElementById('colorAccentText').value = siteData.colors.accent;
+
+            renderProducts();
+            renderCategories();
+        }
+
+        // Modal Functions
+        function openProductModal() {
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Save Product
+        function saveProduct() {
+            const product = {
+                id: Date.now(),
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                price: parseInt(document.getElementById('productPrice').value),
+                description: document.getElementById('productDescription').value,
+                icon: document.getElementById('productIcon').value,
+                gradient: document.getElementById('productGradient').value
+            };
+
+            siteData.products.push(product);
+            saveData();
+            renderProducts();
+            closeModal('productModal');
+            showToast('Product added successfully!');
+            
+            // Clear form
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productDescription').value = '';
+            document.getElementById('productIcon').value = '';
+        }
+
+        // Delete Product
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                siteData.products = siteData.products.filter(p => p.id !== id);
+                saveData();
+                renderProducts();
+                showToast('Product deleted!');
+            }
+        }
+
+        // Save All
+        function saveAll() {
+            // Save hero
+            siteData.hero.title = document.getElementById('heroTitle').value;
+            siteData.hero.subtitle = document.getElementById('heroSubtitle').value;
+            siteData.hero.btnPrimary = document.getElementById('heroBtnPrimary').value;
+            siteData.hero.btnSecondary = document.getElementById('heroBtnSecondary').value;
+
+            // Save contact
+            siteData.contact.phone = document.getElementById('contactPhone').value;
+            siteData.contact.email = document.getElementById('contactEmail').value;
+            siteData.contact.address = document.getElementById('contactAddress').value;
+            siteData.contact.hours = document.getElementById('contactHours').value;
+            siteData.contact.about = document.getElementById('aboutDescription').value;
+
+            // Save colors
+            siteData.colors.primary = document.getElementById('colorPrimary').value;
+            siteData.colors.accent = document.getElementById('colorAccent').value;
+
+            saveData();
+            showToast('All changes saved successfully!');
+        }
+
+        // Export Data
+        function exportData() {
+            const dataStr = JSON.stringify(siteData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dkvworld-data-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            showToast('Data exported successfully!');
+        }
+
+        // Show Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Sync color pickers
+        document.getElementById('colorPrimary').addEventListener('input', (e) => {
+            document.getElementById('colorPrimaryText').value = e.target.value;
+        });
+
+        document.getElementById('colorAccent').addEventListener('input', (e) => {
+            document.getElementById('colorAccentText').value = e.target.value;
+        });
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
